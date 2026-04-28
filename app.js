@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
-// Node.js 22+ yerleşik SQLite3 modülü - ek paket gerektirmez
-const { DatabaseSync } = require("node:sqlite");
+// better-sqlite3: senkron SQLite3 API
+const Database = require("better-sqlite3");
 
 const app = express();
 const PORT = 3000;
@@ -11,7 +11,7 @@ const PORT = 3000;
 //    Aşağıdaki satır isimler.db dosyasını oluşturur (yoksa) veya açar (varsa).
 //    DatabaseSync, dosya yoksa otomatik olarak oluşturur.
 // -----------------------------------------------------------------------
-const db = new DatabaseSync(path.join(__dirname, "isimler.db"));
+const db = new Database(path.join(__dirname, "isimler.db"));
 
 // -----------------------------------------------------------------------
 // 3. TABLO NEREDE OLUŞTURULUYOR:
