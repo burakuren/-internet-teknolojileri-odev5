@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>İsim Düzenle</title>
+</head>
+<body>
+
+  <h1>İsim Düzenle</h1>
+  <hr>
+
+  <form action="/update/<%= id %>" method="POST">
+    <label>Yeni İsim: <input type="text" name="name" value="<%= name %>" /></label>
+    <button type="submit">Güncelle</button>
+  </form>
+
+  <br>
+  <a href="/">Geri Dön</a>
+
+</body>
+</html>

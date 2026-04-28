@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>İsim Yönetimi</title>
+</head>
+<body>
+
+  <h1>İsim Yönetim Sistemi</h1>
+  <hr>
+
+  <h2>Yeni İsim Ekle</h2>
+  <form action="/add" method="POST">
+    <label>İsim: <input type="text" name="name" /></label>
+    <button type="submit">Ekle</button>
+  </form>
+
+  <hr>
+
+  <h2>Kayıtlı İsimler (<%= names.length %>)</h2>
+
+  <% if (names.length === 0) { %>
+    <p>Henüz kayıtlı isim yok.</p>
+  <% } else { %>
+    <table border="1" cellpadding="6" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>İsim</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% names.forEach((row) => { %>
+        <tr>
+          <td><%= row.id %></td>
+          <td><%= row.isim %></td>
+          <td>
+            <a href="/edit/<%= row.id %>">Düzenle</a>
+            &nbsp;
+            <form action="/delete/<%= row.id %>" method="POST" style="display:inline"
+                  onsubmit="return confirm('<%= row.isim %> silinsin mi?')">
+              <button type="submit">Sil</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+</body>
+</html>

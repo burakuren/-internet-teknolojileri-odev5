@@ -1,0 +1,4 @@
+node_modules/
+isimler.db
+*.db-shm
+*.db-wal
