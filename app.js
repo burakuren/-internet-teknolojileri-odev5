@@ -21,12 +21,12 @@ const db = new DatabaseSync(path.join(__dirname, "isimler.db"));
 //    "IF NOT EXISTS" ifadesi sayesinde tablo zaten varsa tekrar oluşturulmaz,
 //    böylece önceki kayıtlar silinmez.
 // -----------------------------------------------------------------------
-db.exec(`
+db.prepare(`
   CREATE TABLE IF NOT EXISTS isimler (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
     isim TEXT    NOT NULL UNIQUE
   )
-`);
+`).run();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
