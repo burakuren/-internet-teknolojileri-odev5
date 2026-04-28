@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Giriş</title>
+</head>
+<body>
+
+  <h1>Giriş Yap</h1>
+  <hr>
+
+  <% if (error) { %>
+    <p style="color:red"><%= error %></p>
+  <% } %>
+
+  <form action="/login" method="POST">
+    <label>E-posta: <input type="text" name="email" /></label><br><br>
+    <label>Şifre:&nbsp;&nbsp; <input type="password" name="password" /></label><br><br>
+    <button type="submit">Giriş</button>
+  </form>
+
+</body>
+</html>

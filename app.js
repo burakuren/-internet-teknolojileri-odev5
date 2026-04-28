@@ -1,11 +1,13 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-// sql.js: WebAssembly tabanlı SQLite3, native derleme gerektirmez
+const session = require("express-session");
 const initSqlJs = require("sql.js");
 
 const app = express();
 const PORT = 3000;
+
+const TEST_USER = { email: "foo", password: "foo" };
 
 // -----------------------------------------------------------------------
 // 2. DATABASE NEREDE OLUŞTURULUYOR:
@@ -28,6 +30,35 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(session({
+  secret: "odev5-secret",
+  resave: false,
+  saveUninitialized: false,
+}));
+
+function requireLogin(req, res, next) {
+  if (req.session.loggedIn) return next();
+  res.redirect("/login");
+}
+
+// Login sayfası
+app.get("/login", (req, res) => {
+  if (req.session.loggedIn) return res.redirect("/");
+  res.render("login", { error: null });
+});
+
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  if (email === TEST_USER.email && password === TEST_USER.password) {
+    req.session.loggedIn = true;
+    return res.redirect("/");
+  }
+  res.render("login", { error: "E-posta veya şifre hatalı." });
+});
+
+app.post("/logout", (req, res) => {
+  req.session.destroy(() => res.redirect("/login"));
+});
 
 // sql.js başlatma async; sunucu hazır olunca dinlemeye başlar
 initSqlJs().then((SQL) => {
@@ -54,7 +85,7 @@ initSqlJs().then((SQL) => {
   // -----------------------------------------------------------------------
   // READ: Ana sayfa - tüm isimleri veritabanından oku ve listele
   // -----------------------------------------------------------------------
-  app.get("/", (req, res) => {
+  app.get("/", requireLogin, (req, res) => {
     res.render("index", { names: getAllNames(db) });
   });
 
@@ -62,7 +93,7 @@ initSqlJs().then((SQL) => {
   // CREATE: Yeni isim ekle
   //    INSERT INTO komutu ile yeni kayıt veritabanına eklenir
   // -----------------------------------------------------------------------
-  app.post("/add", (req, res) => {
+  app.post("/add", requireLogin, (req, res) => {
     const newName = req.body.name ? req.body.name.trim() : "";
     if (!newName) return res.redirect("/");
     try {
@@ -75,7 +106,7 @@ initSqlJs().then((SQL) => {
   });
 
   // Güncelleme formu - mevcut ismi göster
-  app.get("/edit/:id", (req, res) => {
+  app.get("/edit/:id", requireLogin, (req, res) => {
     const id = Number(req.params.id);
     const row = getAllNames(db).find((n) => n.id === id);
     if (!row) return res.redirect("/");
@@ -86,7 +117,7 @@ initSqlJs().then((SQL) => {
   // UPDATE: İsmi güncelle
   //    UPDATE komutu ile mevcut kayıt veritabanında güncellenir
   // -----------------------------------------------------------------------
-  app.post("/update/:id", (req, res) => {
+  app.post("/update/:id", requireLogin, (req, res) => {
     const updatedName = req.body.name ? req.body.name.trim() : "";
     const id = Number(req.params.id);
     if (!updatedName) return res.redirect(`/edit/${id}`);
@@ -103,7 +134,7 @@ initSqlJs().then((SQL) => {
   // DELETE: İsmi sil
   //    DELETE FROM komutu ile kayıt veritabanından silinir
   // -----------------------------------------------------------------------
-  app.post("/delete/:id", (req, res) => {
+  app.post("/delete/:id", requireLogin, (req, res) => {
     db.run("DELETE FROM isimler WHERE id = ?", [Number(req.params.id)]);
     saveDb(db);
     res.redirect("/");
